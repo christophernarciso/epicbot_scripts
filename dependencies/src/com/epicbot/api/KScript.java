@@ -109,6 +109,7 @@ public abstract class KScript extends LoopScript {
         gfx.setFont(f);
         // Script paint frame
         paintFrame.addLine("Time: ", getTimeTracker().format());
+        paintFrame.addLine("Status: ", getStatus());
         paintFrame.draw(gfx, 0, 90, ctx);
     }
 
