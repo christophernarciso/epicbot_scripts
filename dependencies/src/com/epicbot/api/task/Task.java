@@ -1,7 +1,7 @@
 package com.epicbot.api.task;
 
 import com.epicbot.api.KScript;
-import com.epicbot.api.emulators.KScriptContext;
+import com.epicbot.api.generics.KScriptContext;
 
 /**
  * Created by Mitchell on 9-9-2015.

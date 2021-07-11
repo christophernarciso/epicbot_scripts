@@ -1,4 +1,4 @@
-package com.epicbot.api.emulators;
+package com.epicbot.api.generics;
 
 import com.epicbot.api.KScript;
 import com.epicbot.api.trackers.TimeTracker;
