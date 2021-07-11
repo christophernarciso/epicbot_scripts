@@ -2,6 +2,7 @@ package com.epicbot.api;
 
 import com.epicbot.api.shared.APIContext;
 import com.epicbot.api.shared.script.LoopScript;
+import com.epicbot.api.shared.util.paint.frame.PaintFrame;
 import com.epicbot.api.task.Task;
 import com.epicbot.api.task.TaskHandler;
 import com.epicbot.api.trackers.TimeTracker;
@@ -19,12 +20,12 @@ public abstract class KScript extends LoopScript {
     /**
      * Flag used to enable(true) and disable(false) debug.
      */
-    public boolean debug = false;
+    private boolean debug = false;
 
     /**
      * Speed used to control the loop
      */
-    public int loopSpeed;
+    private int loopSpeed;
 
     // Create a Task Handler
     private TaskHandler taskHandler = new TaskHandler();
@@ -32,6 +33,9 @@ public abstract class KScript extends LoopScript {
     private TimeTracker timeTracker = new TimeTracker();
     // Create memory debug runtime
     private Runtime runtime = Runtime.getRuntime();
+
+    // Create PaintFrame
+    private PaintFrame paintFrame = new PaintFrame();
 
     /**
      * Used to run pre init code.
@@ -61,6 +65,7 @@ public abstract class KScript extends LoopScript {
         registerTasks();
         setLoopSpeed(600);
         timeTracker.reset();
+        paintFrame.setTitle(getManifest().name());
         return true;
     }
 
@@ -102,6 +107,9 @@ public abstract class KScript extends LoopScript {
         gfx.fillRect(MEMORY_X, MEMORY_Y, (int) (((totalMemory - freeMemory) / maxMemory) * MEMORY_WIDTH), MEMORY_HEIGHT);
         gfx.drawString(str3, MEMORY_TEXT_X - gfx.getFontMetrics().stringWidth(str3), MEMORY_TEXT_Y);
         gfx.setFont(f);
+        // Script paint frame
+        paintFrame.addLine("Time: ", getTimeTracker().format());
+        paintFrame.draw(gfx, 0, 90, ctx);
     }
 
     /**
@@ -142,16 +150,11 @@ public abstract class KScript extends LoopScript {
         return taskHandler;
     }
 
-    public void setTaskHandler(TaskHandler taskHandler) {
-        this.taskHandler = taskHandler;
-    }
-
     public TimeTracker getTimeTracker() {
         return timeTracker;
     }
 
-    public void setTimeTracker(TimeTracker timeTracker) {
-        this.timeTracker = timeTracker;
+    public PaintFrame getPaintFrame() {
+        return paintFrame;
     }
-
 }
