@@ -198,4 +198,12 @@ public class KContext<M extends KScript> {
     protected IQuestAPI getQuests() {
         return mainKScriptFile.getAPIContext().quests();
     }
+
+    protected ITradeAPI getTrade() {
+        return mainKScriptFile.getAPIContext().trade();
+    }
+
+    protected IPricingAPI getPrice() {
+        return mainKScriptFile.getAPIContext().pricing();
+    }
 }
