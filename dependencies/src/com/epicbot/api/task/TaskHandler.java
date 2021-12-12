@@ -47,18 +47,18 @@ public class TaskHandler {
 
         // idle if no task
         if (currentTask == null) {
-//            if (script.debug) {
-//                script.getLogger().info;
-//            }
-            Time.sleep(500);
+            if (script.isDebug()) {
+                System.out.println("[DEBUG] No task available.");
+            }
+            Time.sleep(600);
             return;
         }
 
         // run the onTaskStart code if needed
         if (newTask) {
-//            if (script.debug) {
-//                script.log("[DEBUG] Now starting " + currentTask.getTaskName());
-//            }
+            if (script.isDebug()) {
+                System.out.println("[DEBUG] Now starting " + currentTask.getTaskName());
+            }
             currentTask.onTaskStart();
         }
 
@@ -68,9 +68,9 @@ public class TaskHandler {
 
         // run the onTaskFinish code if needed
         if (!currentTask.isActive()) {
-//            if (script.debug) {
-//                script.log("[DEBUG] Now stopping " + currentTask.getTaskName());
-//            }
+            if (script.isDebug()) {
+                System.out.println("[DEBUG] Now stopping " + currentTask.getTaskName());
+            }
             currentTask.onTaskFinish();
             currentTask = null;
         }

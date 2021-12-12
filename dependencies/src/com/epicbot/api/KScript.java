@@ -12,12 +12,6 @@ import java.awt.*;
 public abstract class KScript extends LoopScript {
 
     /**
-     * For memory debug
-     */
-    private final int MEMORY_WIDTH = 766, MEMORY_HEIGHT = 2, MEMORY_X = 0,
-            MEMORY_Y = 0, MEMORY_TEXT_X = 760, MEMORY_TEXT_Y = 13;
-
-    /**
      * Flag used to enable(true) and disable(false) debug.
      */
     private boolean debug = false;
@@ -88,40 +82,10 @@ public abstract class KScript extends LoopScript {
     @Override
     protected void onPaint(Graphics2D gfx, APIContext ctx) {
         super.onPaint(gfx, ctx);
-        // Memory debug
-        double maxMemory = runtime.maxMemory();
-        double totalMemory = runtime.totalMemory();
-        double freeMemory = runtime.freeMemory();
-        String str3 = humanReadableByteCount((long) (totalMemory - freeMemory), false),
-                str2 = humanReadableByteCount((long) totalMemory, false),
-                str1 = humanReadableByteCount((long) maxMemory, false);
-        Font f = gfx.getFont();
-        gfx.setFont(new Font("", Font.BOLD, 10));
-        gfx.setColor(new Color(0, 138, 255));
-        gfx.fillRect(MEMORY_X, MEMORY_Y, MEMORY_WIDTH, MEMORY_HEIGHT);
-        gfx.drawString(str1, MEMORY_TEXT_X - gfx.getFontMetrics().stringWidth(str1), MEMORY_TEXT_Y + 18);
-        gfx.setColor(new Color(255, 168, 0));
-        gfx.fillRect(MEMORY_X, MEMORY_Y, (int) ((totalMemory / maxMemory) * MEMORY_WIDTH), MEMORY_HEIGHT);
-        gfx.drawString(str2, MEMORY_TEXT_X - gfx.getFontMetrics().stringWidth(str2), MEMORY_TEXT_Y + 9);
-        gfx.setColor(new Color(255, 0, 0));
-        gfx.fillRect(MEMORY_X, MEMORY_Y, (int) (((totalMemory - freeMemory) / maxMemory) * MEMORY_WIDTH), MEMORY_HEIGHT);
-        gfx.drawString(str3, MEMORY_TEXT_X - gfx.getFontMetrics().stringWidth(str3), MEMORY_TEXT_Y);
-        gfx.setFont(f);
         // Script paint frame
         paintFrame.addLine("Time: ", getTimeTracker().format());
         paintFrame.addLine("Status: ", getStatus());
         paintFrame.draw(gfx, 0, 90, ctx);
-    }
-
-    /**
-     * @return readableBytes for memory
-     */
-    private String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
     /**
