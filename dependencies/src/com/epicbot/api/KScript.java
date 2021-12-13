@@ -59,7 +59,9 @@ public abstract class KScript extends LoopScript {
         registerTasks();
         setLoopSpeed(600);
         timeTracker.reset();
-        paintFrame.setTitle(getManifest().name());
+        paintFrame.setTitle("KScript");
+        paintFrame.addLine("Time: ", getTimeTracker().format());
+        paintFrame.addLine("Status: ", getStatus());
         return true;
     }
 
@@ -77,15 +79,6 @@ public abstract class KScript extends LoopScript {
     @Override
     protected void onStop() {
         super.onStop();
-    }
-
-    @Override
-    protected void onPaint(Graphics2D gfx, APIContext ctx) {
-        super.onPaint(gfx, ctx);
-        // Script paint frame
-        paintFrame.addLine("Time: ", getTimeTracker().format());
-        paintFrame.addLine("Status: ", getStatus());
-        paintFrame.draw(gfx, 0, 90, ctx);
     }
 
     /**

@@ -15,24 +15,33 @@ import java.awt.event.KeyEvent;
 public class FetchTask extends Task {
     @Override
     public boolean isActive() {
-        String plank = Data.larderMode ? Data.OAK_PLANK : Data.MAH_PLANK;
-        return !getInventory().contains(i -> !i.isNoted() && i.getName().equals(plank));
+        // Temporary until fixes..maybe this will be fine?
+        return getInventory().getEmptySlotCount() >= 24;
     }
 
     @Override
     public void run() throws InterruptedException {
         // First we want to stop the script if there is no coins left to pay the service fee.
         if (getInventory().getCount(Data.Coins) >= Data.SERVICE_FEE) {
-            getScript().stop(String.format("A service fee of %d gold is needed to continue running the script", Data.SERVICE_FEE));
+            getScript().stop(String.format("A service fee of %d gold is needed to continue running the script.", Data.SERVICE_FEE));
+            return;
+        }
+
+        // Second we want to stop the script if there is no NOTED planks left.
+        String plank = Data.larderMode ? Data.OAK_PLANK : Data.MAH_PLANK;
+        int plankNotedId = Data.larderMode ? Data.OAK_NOTED : Data.MAH_NOTED;
+        if (!getInventory().contains(plankNotedId)) {
+            getScript().stop("Out of planks so we are now stopping the script.");
             return;
         }
 
         // Get planks from our butler.
-        GameEntity butler = getNpcs().query().named(Data.BUTLER_NAME).distance(2.0).reachable().results().nearest();
+        GameEntity butler = getNpcs().query().named(Data.REG_BUTLER, Data.DEMON_BUTLER)
+                .distance(2.0).reachable().results().nearest();
 
         // Check if the butler is too far from us for efficiency reasons.
         if (butler == null) {
-            System.out.println("Butler does not exist or is farther than 2 tiles");
+            log("Butler does not exist or is farther than 2 tiles");
             // Open the settings tab
             if (!getTabs().isOpen(ITabsAPI.Tabs.SETTINGS))
                 getTabs().open(ITabsAPI.Tabs.SETTINGS);
@@ -43,27 +52,37 @@ public class FetchTask extends Task {
 
             if (houseOptionsMenuCallServant != null && houseOptionsMenuCallServant.isVisible()) {
                 // Call the servant using the menu button
-                System.out.println("Calling butler using house setting button");
-                if (houseOptionsMenuCallServant.interact())
-                    sleepUntil(() -> getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION), 3000, 1000);
+                log("Calling butler using house setting button");
+                if (houseOptionsMenuCallServant.interact()) {
+                    log("Started sleep check for click call");
+                    sleepUntil(() -> getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION), 5000, 1000);
+                    // As of 12/12/2021 getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION) is always returning true
+                    log("Ended sleep check for click call");
+                }
             } else if (houseSettingButton != null && houseSettingButton.isVisible()) {
                 // Open the house settings menu
-                System.out.println("Open house settings menu");
+                log("Open house settings menu");
                 if (houseSettingButton.interact())
                     sleepUntil(this::isHouseSettingButtonVisible, 3000, 1000);
             }
+        } else if (getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.CONTINUE)) {
+            if (getDialogues().selectContinue())
+                sleepUntil(() -> !getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.CONTINUE), 3000, 1000);
         } else if (getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION)) {
-            System.out.println("Sending interact key");
-            getKeyboard().sendKey(KeyEvent.VK_1);
+            log("Sending interact key");
             // Since send key is a void the sleep here will be here whether it was successful or not
-            String plank = Data.larderMode ? Data.OAK_PLANK : Data.MAH_PLANK;
+            getKeyboard().sendKey(KeyEvent.VK_1);
+
             // Service wait time: 7 secs
-            System.out.println("Waiting for our planks to arrive");
-            sleepUntil(() -> getInventory().contains(i -> !i.isNoted() && i.getName().equals(plank)),
-                    10000, 1000);
+            log("Waiting for our planks to arrive");
+            // Broken as of 12/12/2021 so this is just a debug log for now.
+            log("inventory predicate check: " + String.valueOf(getInventory().contains(i -> !i.isNoted() && i.getName().equals(plank))));
+            // 15secs wait time for either butler timer + latency
+            sleepUntil(() -> getInventory().isFull() || getDialogues().canContinue(),
+                    15000, 1000);
         } else if (butler.interact("Talk-to")) {
             // Talk to the butler since he is close.
-            System.out.println("Dialogue with butler");
+            log("Dialogue with butler");
             sleepUntil(() -> getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION), 3000, 1000);
         }
     }
@@ -77,10 +96,15 @@ public class FetchTask extends Task {
      * @return the house settings button widget since we have multiple usages for this query
      */
     private WidgetChild getHouseSettingsButton() {
-        return getWidgets().query().actions("View House Options").results().first();
+        return getWidgets().query().actions("View House Options").visible().results().first();
     }
 
+
+    /**
+     * @return whether the interface is open or not
+     */
     private boolean isHouseSettingButtonVisible() {
-        return getHouseSettingsButton().isValid();
+        WidgetChild test = getHouseSettingsButton();
+        return test != null && test.isVisible();
     }
 }

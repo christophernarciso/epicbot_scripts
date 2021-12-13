@@ -5,7 +5,8 @@ package com.k.construction.data;
  */
 public class Data {
     // General names for npc or equipment
-    public static final String BUTLER_NAME = "Demon butler";
+    public static final String DEMON_BUTLER = "Demon butler";
+    public static final String REG_BUTLER = "Butler";
     public static final String SAW = "Saw";
     public static final String HAMMER = "Hammer";
     public static final String NAILS = "Steel nails";
@@ -16,13 +17,16 @@ public class Data {
     // House object names
     public static final String LARDER_SPACE = "Larder space";
     public static final String CRAFT_COMPLETION_LARDER = "Larder";
-    public static final String CRAFT_COMPLETION_TABLE = "Table";
+    public static final String CRAFT_COMPLETION_TABLE = "Mahogany table";
     public static final String TABLE_SPACE = "Table space";
     public static final String BELL = "Rope bell-pull";
 
+    // Item ids
+    public static final int OAK_NOTED = 8779;
+    public static final int MAH_NOTED = 8783;
 
-    // fees or item amount req
-    public static final int SERVICE_FEE = 10_000;
+    // Fees or item amount req
+    public static final int SERVICE_FEE = 10000;
     public static final int OAK_REQ = 8;
     public static final int MAH_REQ = 6;
 

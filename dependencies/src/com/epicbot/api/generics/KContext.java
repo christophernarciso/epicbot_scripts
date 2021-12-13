@@ -56,7 +56,8 @@ public class KContext<M extends KScript> {
 
     // Debugging function
     protected void log(String s) {
-
+        if (mainKScriptFile.isDebug())
+            System.out.println(s);
     }
 
     /**

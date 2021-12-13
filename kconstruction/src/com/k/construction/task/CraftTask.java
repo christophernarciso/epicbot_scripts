@@ -22,14 +22,17 @@ public class CraftTask extends Task {
 
         // If it exists then remove it
         if (remove != null) {
-            System.out.println("Removable object found");
-            if (getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION)) {
-                System.out.println("Sending interact key");
+            log("Removable object found");
+            if (getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.CONTINUE)) {
+                if (getDialogues().selectContinue())
+                    sleepUntil(() -> !getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.CONTINUE), 3000, 1000);
+            } else if (getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION)) {
+                log("Sending interact key");
                 getKeyboard().sendKey(KeyEvent.VK_1);
                 // Since send key is a void the sleep here will be here whether it was successful or not
                 sleepUntil(() -> !getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION), 3000, 1000);
             } else if (remove.interact("Remove")) {
-                System.out.println("Process remove of completed object");
+                log("Process remove of completed object");
                 sleepUntil(() -> getDialogues().isDialogueOpen(IDialogueAPI.DialogueType.OPTION),
                         3000, 1000);
             }
@@ -40,13 +43,13 @@ public class CraftTask extends Task {
         GameEntity craft = getCraftObject();
 
         if (getWidgets().isInterfaceOpen()) {
-            System.out.println("Sending interact key");
+            log("Sending interact key");
             getKeyboard().sendKey(getCraftInteractKeyBind());
             // Since send key is a void the sleep here will be here whether it was successful or not.
             sleepUntil(() -> !getWidgets().isInterfaceOpen(), 3000, 1000);
         } else if (craft != null && craft.interact("Build")) {
             // Wait until the craft interface opens
-            System.out.println("Process build of craft object");
+            log("Process build of craft object");
             sleepUntil(() -> getWidgets().isInterfaceOpen(), 5000, 1000);
         }
     }
@@ -76,6 +79,6 @@ public class CraftTask extends Task {
      * @return the key-bind associated with each craft
      */
     private int getCraftInteractKeyBind() {
-        return Data.larderMode ? KeyEvent.VK_2 : KeyEvent.VK_3;
+        return Data.larderMode ? KeyEvent.VK_2 : KeyEvent.VK_6;
     }
 }
